@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Objects;
@@ -49,6 +50,10 @@ public class PosServiceImpl implements PosService {
     }
 
     // TODO: Implement getByName after adding it to the PosService interface. Note that the PosDataService already supports filtering by name.
+    public Pos getByName(@NonNull String name) throws PosNotFoundException {
+        log.debug("Retrieving POS with name: {}", name);
+        return posDataService.getByName(name);
+    }
 
     @Override
     public @NonNull Pos upsert(@NonNull Pos pos) throws PosNotFoundException {

@@ -93,12 +93,11 @@ public class CucumberPosSteps {
     }
 
     // TODO: Add Given step for new scenario
-    @Given("the following POS elements exist")
-    public void theFollowingPosElementsExist(List<PosDto> posList) {
-        List<PosDto> createdPos = createPos(posList);
-        assertThat(createdPos).size().isEqualTo(posList.size());
+    @Given("three existing POS")
+    public void threeExitingPos(List<PosDto> posList) {
+        createdPosList = createPos(posList);
+        assertThat(createdPosList).size().isEqualTo(3);
     }
-
     // When -----------------------------------------------------------------------
 
     @When("I insert POS with the following elements")
@@ -108,15 +107,13 @@ public class CucumberPosSteps {
     }
 
     // TODO: Add When step for new scenario
-    @When("I update the POS with id {long} to have the following values")
-    public void iUpdateThePosWithIdToHaveTheFollowingValues(Long id, PosDto updatedPosDto) {
-        updatedPos = updatePos(
-                List.of(
-                        updatedPosDto.toBuilder()
-                                .id(id)
-                                .build()
-                )
-        ).getFirst();
+    @When("I update the POS with name {string} to have description {string}")
+    public void iUpdateDescription(String name, String description) {
+        PosDto posToUpdate = retrievePosByName(name);
+        PosDto updatedPosDto = posToUpdate.toBuilder()
+                .description(description)
+                .build();
+        updatedPos = updatePos(List.of(updatedPosDto)).getFirst();
         assertThat(updatedPos).isNotNull();
     }
     // Then -----------------------------------------------------------------------
@@ -130,12 +127,9 @@ public class CucumberPosSteps {
     }
 
     // TODO: Add Then step for new scenario
-    @Then("the POS with id {long} should have the updated values")
-    public void thePosWithIdShouldHaveTheUpdatedValues(Long id) {
-        PosDto retrievedPos = retrievePosById(id);
-        assertThat(retrievedPos)
-                .usingRecursiveComparison()
-                .ignoringFields("createdAt", "updatedAt")
-                .isEqualTo(updatedPos);
+    @Then("the POS named {string} should have the description {string}")
+    public void thePosNamedShouldHaveTheDescription(String name, String description) {
+        PosDto retrievedPos = retrievePosByName(name);
+        assertThat(retrievedPos.description()).isEqualTo(description);
     }
 }
