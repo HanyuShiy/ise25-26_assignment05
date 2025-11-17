@@ -65,12 +65,13 @@ public class CucumberPosSteps {
 
     /**
      * Register a Cucumber DataTable type for PosDto.
+     *
      * @param row the DataTable row to map to a PosDto object
      * @return the mapped PosDto object
      */
     @DataTableType
     @SuppressWarnings("unused")
-    public PosDto toPosDto(Map<String,String> row) {
+    public PosDto toPosDto(Map<String, String> row) {
         return PosDto.builder()
                 .name(row.get("name"))
                 .description(row.get("description"))
@@ -92,6 +93,11 @@ public class CucumberPosSteps {
     }
 
     // TODO: Add Given step for new scenario
+    @Given("the following POS elements exist")
+    public void theFollowingPosElementsExist(List<PosDto> posList) {
+        List<PosDto> createdPos = createPos(posList);
+        assertThat(createdPos).size().isEqualTo(posList.size());
+    }
 
     // When -----------------------------------------------------------------------
 
@@ -102,7 +108,17 @@ public class CucumberPosSteps {
     }
 
     // TODO: Add When step for new scenario
-
+    @When("I update the POS with id {long} to have the following values")
+    public void iUpdateThePosWithIdToHaveTheFollowingValues(Long id, PosDto updatedPosDto) {
+        updatedPos = updatePos(
+                List.of(
+                        updatedPosDto.toBuilder()
+                                .id(id)
+                                .build()
+                )
+        ).getFirst();
+        assertThat(updatedPos).isNotNull();
+    }
     // Then -----------------------------------------------------------------------
 
     @Then("the POS list should contain the same elements in the same order")
@@ -114,4 +130,12 @@ public class CucumberPosSteps {
     }
 
     // TODO: Add Then step for new scenario
+    @Then("the POS with id {long} should have the updated values")
+    public void thePosWithIdShouldHaveTheUpdatedValues(Long id) {
+        PosDto retrievedPos = retrievePosById(id);
+        assertThat(retrievedPos)
+                .usingRecursiveComparison()
+                .ignoringFields("createdAt", "updatedAt")
+                .isEqualTo(updatedPos);
+    }
 }
